@@ -444,7 +444,7 @@ void Life3D_Engine::initFont()
 void Life3D_Engine::initVariables()
 {
 	this->velocity = 0.2f;
-	this->amount = 10000;
+	this->amount = 25000;
 	this->postProcessingChoice = 7;
 	this->distanceMax = 150.0f;
 	this->scale = 0.25f;

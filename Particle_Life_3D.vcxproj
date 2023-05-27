@@ -29,7 +29,6 @@
     <None Include="Shader\text.vs" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="glad.c" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
     <ClCompile Include="imgui\imgui_draw.cpp" />
@@ -37,14 +36,15 @@
     <ClCompile Include="imgui\imgui_impl_opengl3.cpp" />
     <ClCompile Include="imgui\imgui_tables.cpp" />
     <ClCompile Include="imgui\imgui_widgets.cpp" />
-    <ClCompile Include="Life3D_Engine.cpp" />
-    <ClCompile Include="Life3D_Particles.cpp" />
-    <ClCompile Include="Life_3D.cpp" />
-    <ClCompile Include="stb_handler.cpp" />
+    <ClCompile Include="src\glad.c" />
+    <ClCompile Include="src\Life3D_Engine.cpp" />
+    <ClCompile Include="src\Life3D_Particles.cpp" />
+    <ClCompile Include="src\Life_3D.cpp" />
+    <ClCompile Include="src\stb_handler.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Life3D_Engine.h" />
-    <ClInclude Include="Life3D_Particles.h" />
+    <ClInclude Include="src\Life3D_Engine.h" />
+    <ClInclude Include="src\Life3D_Particles.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
