@@ -13,7 +13,7 @@ vec3 color = vec3(0.0);
 
 vec3 glowColor = vec3(1.0, 1.0, 0.0);
 const float bloomThreshold = 0.7;  // Threshold for bright pixels
-const float bloomIntensity = 1.5;  // Intensity of the bloom effect
+const float bloomIntensity = 1.4;  // Intensity of the bloom effect
 
 
 uniform int choice;
