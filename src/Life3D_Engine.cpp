@@ -62,8 +62,8 @@ Life3D_Engine::Life3D_Engine()
 	this->initFont();
 	this->initVariables();
 	this->initCamera();
-	this->sphere = new Model("resources\\models\\lp_sphere\\lp_sphere.obj");
-	this->cube = new Model("resources\\models\\cube\\cube.obj");
+	this->sphere = new Model(".\\resources\\models\\lp_sphere\\lp_sphere.obj");
+	this->cube = new Model(".\\resources\\models\\cube\\cube.obj");
 
 	this->red = this->create(amount, RED);
 	this->green = this->create(amount, GREEN);
