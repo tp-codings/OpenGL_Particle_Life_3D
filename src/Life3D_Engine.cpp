@@ -444,14 +444,14 @@ void Life3D_Engine::initFont()
 void Life3D_Engine::initVariables()
 {
 	this->velocity = 0.2f;
-	this->amount = 25000;
+	this->amount = 2500;
 	this->postProcessingChoice = 7;
 	this->distanceMax = 150.0f;
 	this->scale = 0.25f;
 	this->cubeSize = 250.0f;
 	this->cameraSpeed = 80.0f;
 
-	this->TIME_STEP = 0.003f;
+	this->TIME_STEP = 0.2f;
 	this->frictionHalfLife = 0.04f;
 	this->friction = pow(0.5, this->TIME_STEP / this->frictionHalfLife);
 
@@ -649,7 +649,7 @@ void Life3D_Engine::update()
 	{
 		std::vector<std::thread> threads; // Vektor für die Thread-Objekte
 
-#pragma omp parallel for
+//#pragma omp parallel for
 		for (int i = 0; i < 5; i++)
 		{
 			for (int j = 0; j < 5; j++)
@@ -669,6 +669,14 @@ void Life3D_Engine::update()
 		{
 			thread.join();
 		}
+		//for (int i = 0; i < 5; i++)
+		//{
+		//	for (int j = 0; j < 5; j++)
+		//	{
+
+		//		this->updateInteraction(this->particles[i], this->particles[j], this->attraction[i][j]);
+		//	}
+		//}
 	}
 
 	for (int i = 0; i < this->particles.size(); i++)
@@ -732,17 +740,17 @@ void Life3D_Engine::updateInteraction(std::vector<Life3D_Particles*> particle1, 
 
 			if (distance > 0 && distance < this->distanceMax)
 			{
-				const float f = this->force(distance / this->distanceMax, attraction);
+				//const float f = this->force(distance / this->distanceMax, attraction);
 
-				fx += dx / distance * f;
-				fy += dy / distance * f;
-				fz += dz / distance * f;
+				fx += dx / distance * attraction;
+				fy += dy / distance * attraction;
+				fz += dz / distance * attraction;
 			}
 		}
 
-		fx *= this->distanceMax * 10;
-		fy *= this->distanceMax * 10;
-		fz *= this->distanceMax * 10;
+		//fx *= this->distanceMax * 10;
+		//fy *= this->distanceMax * 10;
+		//fz *= this->distanceMax * 10;
 
 		particle1[i]->setVel(glm::vec3(
 			particle1[i]->getVelocity().x * this->friction + fx * this->TIME_STEP,
@@ -1039,7 +1047,7 @@ void Life3D_Engine::DrawSettings()
 		ImGui::Text("Rot");
 		ImGui::SliderFloat("rr", &this->attraction[0][0], -1.0f, 1.0f);
 		ImGui::SliderFloat("rg", &this->attraction[0][1], -1.0f, 1.0f);
-		ImGui::SliderFloat("rb", &this->attraction[0][2], -1.0f, 1.0f);											//Farben als enum und Text automatisch an Farbe anpassen
+		ImGui::SliderFloat("rb", &this->attraction[0][2], -1.0f, 1.0f);											
 		ImGui::SliderFloat("ry", &this->attraction[0][3], -1.0f, 1.0f);
 		ImGui::SliderFloat("rw", &this->attraction[0][4], -1.0f, 1.0f);
 		ImGui::Text("Gruen");

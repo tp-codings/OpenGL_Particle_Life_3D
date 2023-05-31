@@ -6,15 +6,9 @@ in vec2 TexCoords;
 uniform sampler2D screenTexture;
 
 const float offset = 1.0 / 300.0;
-float blurRadius = 5.0;
 
 vec3 col = vec3(0.0);
 vec3 color = vec3(0.0);
-
-vec3 glowColor = vec3(1.0, 1.0, 0.0);
-const float bloomThreshold = 0.7;  // Threshold for bright pixels
-const float bloomIntensity = 1.4;  // Intensity of the bloom effect
-
 
 uniform int choice;
 
@@ -92,48 +86,6 @@ void main()
 		case 5:
 			for(int i = 0; i<9; i++)
 				col += sampleTex[i] * dafuqKernel[i];
-			break;
-
-		case 6:
-			// Originalfarbe des Fragments
-			vec4 texColor = texture(screenTexture, TexCoords);
-    
-			// Helligkeitswert des Pixels
-			float brightness = (texColor.r + texColor.g + texColor.b) / 3.0;
-
-			// Originalfarbe beibehalten
-			vec3 originalColor = texColor.rgb;
-    
-			// Pr�fen, ob der Pixel �ber dem Schwellenwert liegt
-			if (brightness > bloomThreshold)
-			{
-				// Gl�hende Farbe berechnen
-				vec3 finalGlowColor = glowColor * brightness;
-        
-				// Blur-Effekt
-				vec3 blurColor = vec3(0.0);
-				vec2 texelSize = 1.0 / textureSize(screenTexture, 0);
-        
-				for (int i = -1; i <= 1; i++)
-				{
-					for (int j = -1; j <= 1; j++)
-					{
-						vec2 offsettt = vec2(i, j) * texelSize * blurRadius;
-						blurColor += texture(screenTexture, TexCoords + offsettt).rgb * blurKernel[(i + 1) * 3 + (j + 1)];
-					}
-				}
-        
-				// Gl�hende Farbe zum Blur-Ergebnis hinzuf�gen
-				color = vec3(originalColor + texColor.rgb + finalGlowColor + blurColor);
-			}
-			else
-			{
-				FragColor = texColor;
-			}
-   
-
-			col = color;
-			FragColor = vec4(col, 1.0);
 			break;
 		default:
 			col = vec3(texture(screenTexture, TexCoords));
