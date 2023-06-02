@@ -1,5 +1,7 @@
 #include "Life3D_Engine.h"
 #include <thread>
+#include <random>
+
 // Grundfarben
 #define RED glm::vec3(1.0f, 0.0f, 0.0f)
 #define GREEN glm::vec3(0.0f, 1.0f, 0.0f)
@@ -72,7 +74,21 @@ Life3D_Engine::Life3D_Engine()
 	this->yellow = this->create(amount, YELLOW);
 	this->white = this->create(amount, WHITE);
 
-	
+	std::random_device rd;
+	std::mt19937 gen(rd()); 
+	std::uniform_real_distribution<float> dis(0.0f, 1.0f);
+
+	glm::vec3* rColors = new glm::vec3[this->amount * 5];
+
+	for (int i = 0; i < this->amount * 5-1; i++) {
+		rColors[i] = glm::vec3(dis(gen), dis(gen), dis(gen));
+	}
+
+	this->randomColors = new glm::vec3[this->amount * 5];
+	std::memcpy(this->randomColors, rColors, sizeof(glm::vec3) * (this->amount * 5));
+	delete[] rColors;
+
+
 
 	this->initBuffer();
 
@@ -338,7 +354,6 @@ void Life3D_Engine::initBuffer()
 	{
 		unsigned int VAO = this->sphere->meshes[i].VAO;
 		glBindVertexArray(VAO);
-		// set attribute pointers for matrix (4 times vec4)
 		glEnableVertexAttribArray(3);
 		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
 		glEnableVertexAttribArray(4);
@@ -360,14 +375,12 @@ void Life3D_Engine::initBuffer()
 	glBindBuffer(GL_ARRAY_BUFFER, this->colorVBO);
 	glBufferData(GL_ARRAY_BUFFER, this->colorData.size() * sizeof(glm::vec3), &this->colorData[0], GL_STATIC_DRAW);
 
-	// Setze die Farbdaten als ein Instanz-Vertexattribut
 	for (unsigned int i = 0; i < this->sphere->meshes.size(); i++)
 	{
 		unsigned int VAO = this->sphere->meshes[i].VAO;
 		glBindVertexArray(VAO);
 
-		// Setze den Attributpointer für Farben
-		glEnableVertexAttribArray(7); // Annahme: Verwende Attributindex 7 für Farben
+		glEnableVertexAttribArray(7); 
 		glVertexAttribPointer(7, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
 		glVertexAttribDivisor(7, 1);
 
@@ -1108,6 +1121,32 @@ void Life3D_Engine::DrawSettings()
 		if (ImGui::Button("NormalShading"))
 		{
 			this->shaderChoice = 1;
+		}		
+		ImGui::SameLine();
+		if (ImGui::Button("RandomColors"))
+		{
+			std::random_device rd;
+			std::mt19937 gen(rd());
+			std::uniform_real_distribution<float> dis(0.0f, 1.0f);
+
+			glm::vec3* rColors = new glm::vec3[this->amount * 5];
+
+			for (int i = 0; i < this->amount * 5 - 1; i++) {
+				rColors[i] = glm::vec3(dis(gen), dis(gen), dis(gen));
+			}
+
+			this->randomColors = new glm::vec3[this->amount * 5];
+			std::memcpy(this->randomColors, rColors, sizeof(glm::vec3) * (this->amount * 5));
+			delete[] rColors;
+
+			glBindBuffer(GL_ARRAY_BUFFER, this->colorVBO);
+			glBufferSubData(GL_ARRAY_BUFFER, 0, 5*amount *sizeof(glm::vec3), &this->randomColors[0]);
+		}		
+		ImGui::SameLine();
+		if (ImGui::Button("NormalColors"))
+		{
+			glBindBuffer(GL_ARRAY_BUFFER, this->colorVBO);
+			glBufferSubData(GL_ARRAY_BUFFER, 0, 5*amount *sizeof(glm::vec3), &this->colorData[0]);
 		}
 		ImGui::Text("Rot");
 		ImGui::SliderFloat("rr", &this->attraction[0][0], -1.0f, 1.0f);

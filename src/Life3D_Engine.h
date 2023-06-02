@@ -82,6 +82,7 @@ private:
 
 	std::vector<glm::mat4> modelMatrices;
 	std::vector<glm::vec3> colorData;
+	glm::vec3* randomColors;
 
 	//Particles
 	std::vector<Life3D_Particles*> red;
