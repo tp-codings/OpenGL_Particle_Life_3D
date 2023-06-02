@@ -100,7 +100,7 @@ private:
 	int postProcessingChoice;
 	int shaderChoice;
 
-	float velocity;
+	float timeFactor;
 	float distanceMax;
 	float cubeSize;
 	float scale;

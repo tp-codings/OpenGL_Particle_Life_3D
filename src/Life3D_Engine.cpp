@@ -62,7 +62,7 @@ Life3D_Engine::Life3D_Engine()
 	this->initFont();
 	this->initVariables();
 	this->initCamera();
-	this->sphere = new Model(".\\resources\\models\\lp_sphere\\lp_sphere.obj");
+	this->sphere = new Model(".\\resources\\models\\sphere\\sphere.obj");
 	this->cube = new Model(".\\resources\\models\\cube\\cube.obj");
 
 	this->red = this->create(amount, RED);
@@ -443,15 +443,15 @@ void Life3D_Engine::initFont()
 
 void Life3D_Engine::initVariables()
 {
-	this->velocity = 0.2f;
+	this->timeFactor = 0.2f;
 
-	this->amount = 2000;
+	this->amount = 10000;
 	this->postProcessingChoice = 7;
 	this->shaderChoice = 1;
 	this->distanceMax = 150.0f;
-	this->scale = 0.25f;
+	this->scale = 0.6f;
 	this->cubeSize = 250.0f;
-	this->cameraSpeed = 80.0f;
+	this->cameraSpeed = 200.0f;
 
 	this->TIME_STEP = 0.2f;
 	this->frictionHalfLife = 0.04f;
@@ -756,14 +756,14 @@ void Life3D_Engine::updateInteraction(std::vector<Life3D_Particles*> particle1, 
 		fz *= this->distanceMax;
 
 		particle1[i]->setVel(glm::vec3(
-			particle1[i]->getVelocity().x * this->friction + fx * this->deltaTime/2.f,
-			particle1[i]->getVelocity().y * this->friction + fy * this->deltaTime/2.f,
-			particle1[i]->getVelocity().z * this->friction + fz * this->deltaTime/2.f
+			particle1[i]->getVelocity().x * this->friction + fx * this->deltaTime/((float)this->amount/1000) * this->timeFactor,
+			particle1[i]->getVelocity().y * this->friction + fy * this->deltaTime/((float)this->amount/1000) * this->timeFactor,
+			particle1[i]->getVelocity().z * this->friction + fz * this->deltaTime/((float)this->amount/1000) * this->timeFactor
 		));
 
 
 		particle1[i]->setPos(glm::vec3(
-			particle1[i]->getPos() + particle1[i]->getVelocity() * this->deltaTime/2.f
+			particle1[i]->getPos() + particle1[i]->getVelocity() * this->deltaTime/((float)this->amount / 1000) * this->timeFactor
 		));
 
 
@@ -962,13 +962,11 @@ void Life3D_Engine::DrawSettings()
 		ImGui::SetWindowSize(size);
 		ImGui::Text("Settings");
 		ImGui::SetNextItemWidth((float)this->WINDOW_WIDTH / 5);
-		ImGui::SliderFloat("Velocity", &this->velocity, 0.0f, 1.0f);
+		ImGui::SliderFloat("Timefactor", &this->timeFactor, 0.0f, 1.0f);
 		ImGui::SetNextItemWidth((float)this->WINDOW_WIDTH / 5);
 		ImGui::SliderFloat("Distance", &this->distanceMax, 0.0f, 700.0f);
 		ImGui::SetNextItemWidth((float)this->WINDOW_WIDTH / 5);
 		ImGui::SliderFloat("Scale", &this->scale, 0.00f, 2.0f);
-		ImGui::SetNextItemWidth((float)this->WINDOW_WIDTH / 5);
-		ImGui::SliderFloat("Friction", &this->friction, 0.00f, 1.0f);
 		ImGui::SetNextItemWidth((float)this->WINDOW_WIDTH / 5);
 		ImGui::SliderFloat("Boxsize", &this->cubeSize, 1.0f, 700.0f);
 		ImGui::SetNextItemWidth((float)this->WINDOW_WIDTH / 5);
