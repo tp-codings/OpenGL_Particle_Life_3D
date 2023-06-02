@@ -64,12 +64,15 @@ Life3D_Engine::Life3D_Engine()
 	this->initCamera();
 	this->sphere = new Model(".\\resources\\models\\sphere\\sphere.obj");
 	this->cube = new Model(".\\resources\\models\\cube\\cube.obj");
+	this->lightSource = new Model(".\\resources\\models\\sphere\\sphere.obj");
 
 	this->red = this->create(amount, RED);
 	this->green = this->create(amount, GREEN);
 	this->blue = this->create(amount, BLUE);
 	this->yellow = this->create(amount, YELLOW);
 	this->white = this->create(amount, WHITE);
+
+	
 
 	this->initBuffer();
 
@@ -445,7 +448,7 @@ void Life3D_Engine::initVariables()
 {
 	this->timeFactor = 0.2f;
 
-	this->amount = 10000;
+	this->amount = 2000;
 	this->postProcessingChoice = 7;
 	this->shaderChoice = 1;
 	this->distanceMax = 150.0f;
@@ -466,6 +469,10 @@ void Life3D_Engine::initVariables()
 	this->lastTime = (float)glfwGetTime();
 
 	this->dirLightColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+	this->dirLightDirection = glm::vec3(1.0, 1.0, 1.0);
+	this->angleHor = 0.0f;
+	this->angleVer = 1.0f;
+	this->dirLightPos = glm::vec3(this->dirLightDirection * this->cubeSize*4.f);
 
 	this->projection = glm::mat4(1.0f);
 	this->view = glm::mat4(1.0f);
@@ -496,6 +503,22 @@ void Life3D_Engine::processInput(GLFWwindow* window, Shader reflectionShader)
 	{
 		this->viewMode = true;
 		glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	}
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+	{
+		this->angleHor += this->deltaTime;
+	}
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+	{
+		this->angleHor -= this->deltaTime;
+	}
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+	{
+		this->angleVer += this->deltaTime;
+	}
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+	{
+		this->angleVer -= this->deltaTime;
 	}
 
 
@@ -870,8 +893,8 @@ void Life3D_Engine::updateInteraction(std::vector<Life3D_Particles*> particle1, 
 void Life3D_Engine::Draw()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, this->framebuffer);
-	glEnable(GL_DEPTH_TEST);
-	glClearColor(BLACK.r, BLACK.g, BLACK.b, 1.0f);
+	glEnable(GL_DEPTH_TEST);  
+	glClearColor(this->dirLightColor.x*0.1f, this->dirLightColor.y * 0.1f, this->dirLightColor.z * 0.1f, 1.0f);
 
 	//Bufferclear
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -883,6 +906,8 @@ void Life3D_Engine::Draw()
 	{
 		this->DrawCube();
 	}
+
+
 
 	this->DrawText(this->textShader, "FPS: " + std::to_string((int)this->FPS), 0.0f, (float)this->WINDOW_HEIGHT - 1 * (float)this->fontSize, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f));
 	this->DrawText(this->textShader, "Pos: " + std::to_string(this->camera.Position.x) + ", " + std::to_string(this->camera.Position.y) + ", " + std::to_string(this->camera.Position.z), 0.0f, (float)this->WINDOW_HEIGHT - 2 * (float)this->fontSize, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f));
@@ -904,9 +929,9 @@ void Life3D_Engine::DrawScene()
 	this->particleShader.setMat4("view", this->view);
 
 	this->particleShader.setVec3("dirLightColor", glm::vec3(this->dirLightColor.x, this->dirLightColor.y, this->dirLightColor.z));
-	this->particleShader.setVec3("dirLightDir", glm::vec3(-1.0));
+	this->particleShader.setVec3("dirLightDir", -this->dirLightPos);
 	this->particleShader.setVec3("lightColor", glm::vec3(BLACK));
-	this->particleShader.setVec3("lightPos", glm::vec3(20.0, 20.0, 20.0));
+	this->particleShader.setVec3("lightPos", this->dirLightPos);
 	this->particleShader.setVec3("viewPos", camera.Position);
 	this->particleShader.setInt("shininess", 256);
 	this->particleShader.setInt("shaderChoice", this->shaderChoice);
@@ -943,6 +968,32 @@ void Life3D_Engine::DrawScene()
 		}
 	}
 	glBindVertexArray(0);
+
+	//Zeichne Sonne
+	if (this->shaderChoice == 0)
+	{
+		float sinAngleHor = sin(angleHor);
+		float cosAngleHor = cos(angleHor);
+		float sinAngleVer = sin(angleVer); 
+		float cosAngleVer = cos(angleVer); 
+		float lichtBahnRadius = this->cubeSize * 4.f;
+		float lightX = sinAngleHor * sinAngleVer * lichtBahnRadius; 
+		float lightY = cosAngleVer * lichtBahnRadius; 
+		float lightZ = cosAngleHor * sinAngleVer * lichtBahnRadius; 
+		this->dirLightPos = glm::vec3(lightX, lightY, lightZ);
+
+
+		this->cubeShader.use();
+		this->cubeShader.setMat4("projection", this->projection);
+		this->cubeShader.setMat4("view", this->view);
+		this->cubeShader.setBool("sphere", true);
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, this->dirLightPos);
+		model = glm::scale(model, glm::vec3(40.f));
+		this->cubeShader.setMat4("model", model);
+		this->cubeShader.setVec3("color", glm::vec3(this->dirLightColor.x, this->dirLightColor.y, this->dirLightColor.z));
+		this->lightSource->Draw(this->cubeShader);
+	}
 }
 
 void Life3D_Engine::DrawSettings()
@@ -1126,7 +1177,9 @@ void Life3D_Engine::DrawCube()
 	float scaleFactor = this->cubeSize; // Skalierungsfaktor berechnen
 	model = glm::scale(model, glm::vec3(scaleFactor));
 	this->cubeShader.setMat4("model", model);
-	this->cubeShader.setVec3("color", blue[0]->getColor());
+	this->cubeShader.setVec3("color", BLUE_GREEN);
+	this->cubeShader.setBool("sphere", false);
+
 	this->cube->Draw(this->cubeShader);
 }
 

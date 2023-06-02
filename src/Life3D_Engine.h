@@ -91,6 +91,12 @@ private:
 	std::vector<Life3D_Particles*> white;
 	std::vector<std::vector<Life3D_Particles*>> particles;
 
+	Model* lightSource;
+	glm::vec3 dirLightDirection;
+	glm::vec3 dirLightPos;
+	float angleHor;
+	float angleVer;
+
 	//World objects
 	Model* sphere;
 	Model* cube;

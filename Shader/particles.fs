@@ -27,7 +27,7 @@ void main()
 {    
     switch(shaderChoice){
         case 0: 
-            float ambientStrength = 0.4;
+            float ambientStrength = 0.1;
     
             // Ambient Light
             vec3 ambient = ambientStrength * vColor;

@@ -7,8 +7,15 @@ uniform sampler2D texture_diffuse1;
 
 uniform vec3 color;
 
+uniform bool sphere;
+
 void main()
 {    
     //FragColor = texture(texture_diffuse1, TexCoords);
-    FragColor = vec4(color, 0.2);
+    if(sphere){
+        FragColor = vec4(color, 1.0);
+    }
+    else{
+        FragColor = vec4(color, 0.2);
+    }
 }
