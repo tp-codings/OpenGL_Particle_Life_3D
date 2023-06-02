@@ -444,8 +444,10 @@ void Life3D_Engine::initFont()
 void Life3D_Engine::initVariables()
 {
 	this->velocity = 0.2f;
-	this->amount = 2500;
+
+	this->amount = 2000;
 	this->postProcessingChoice = 7;
+	this->shaderChoice = 1;
 	this->distanceMax = 150.0f;
 	this->scale = 0.25f;
 	this->cubeSize = 250.0f;
@@ -461,7 +463,7 @@ void Life3D_Engine::initVariables()
 
 	this->frameCount = 0;
 	this->FPS = 0.0f;
-	this->lastTime = glfwGetTime();
+	this->lastTime = (float)glfwGetTime();
 
 	this->dirLightColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -518,16 +520,16 @@ void Life3D_Engine::mouse_callback(double xpos, double ypos)
 {
 	if (this->firstMouse)
 	{
-		this->lastMouseX = xpos;
-		this->lastMouseY = ypos;
+		this->lastMouseX = (float)xpos;
+		this->lastMouseY = (float)ypos;
 		this->firstMouse = false;
 	}
 
-	float xoffset = xpos - this->lastMouseX;
-	float yoffset = this->lastMouseY - ypos;
+	float xoffset = (float)xpos - this->lastMouseX;
+	float yoffset = this->lastMouseY - (float)ypos;
 
-	this->lastMouseX = xpos;
-	this->lastMouseY = ypos;
+	this->lastMouseX = (float)xpos;
+	this->lastMouseY = (float)ypos;
 
 	if (this->viewMode)
 	{
@@ -543,7 +545,7 @@ void Life3D_Engine::mouse_callback_wrapper(GLFWwindow* window, double xpos, doub
 
 void Life3D_Engine::scroll_callback(double xoffset, double yoffset)
 {
-	this->camera.ProcessMouseScroll(yoffset);
+	this->camera.ProcessMouseScroll((float)yoffset);
 }
 
 void Life3D_Engine::scroll_callback_wrapper(GLFWwindow* window, double xoffset, double yoffset)
@@ -602,9 +604,9 @@ std::vector<Life3D_Particles*> Life3D_Engine::create(int number, glm::vec3 color
 	std::vector<Life3D_Particles*> group;
 	for (int i = 0; i < number; i++)
 	{
-		int posX = random(this->cubeSize * 2, -this->cubeSize);
-		int posY = random(this->cubeSize * 2, -this->cubeSize);
-		int posZ = random(this->cubeSize * 2, -this->cubeSize);
+		int posX = random((int)this->cubeSize * 2, -(int)this->cubeSize);
+		int posY = random((int)this->cubeSize * 2, -(int)this->cubeSize);
+		int posZ = random((int)this->cubeSize * 2, -(int)this->cubeSize);
 		group.push_back(new Life3D_Particles(glm::vec3(posX, posY, posZ), color));
 
 		glm::mat4 model = glm::mat4(1.0f);
@@ -624,7 +626,7 @@ int Life3D_Engine::random(int range, int start)
 
 float Life3D_Engine::force(float r, float a)
 {
-	const float beta = 0.3;
+	const float beta = 0.3f;
 	if (r < beta)
 	{
 		return r / beta - 1;
@@ -659,7 +661,7 @@ void Life3D_Engine::update()
 					this->updateInteraction(this->particles[i], this->particles[j], this->attraction[i][j]);
 				};
 
-				// Erstellen des std::thread-Objekts und Hinzufügen zum Vektor
+				// Erstellen des thread-Objekts und Hinzufügen zum Vektor
 				threads.emplace_back(threadFunc);
 			}
 		}
@@ -727,40 +729,41 @@ void Life3D_Engine::updateInteraction(std::vector<Life3D_Particles*> particle1, 
 {
 	for (int i = 0; i < particle1.size(); i++)
 	{
-		float fx = 0;
+		float fx = 0;	//f hier gleichzusetzen mit a, da die Massen aller Teilchen 1 sind
 		float fy = 0;
 		float fz = 0;
 
 		for (int j = 0; j < particle2.size(); j++)
 		{
-			float dx = particle1[i]->getPos().x - particle2[j]->getPos().x;
-			float dy = particle1[i]->getPos().y - particle2[j]->getPos().y;
-			float dz = particle1[i]->getPos().z - particle2[j]->getPos().z;
+			float dx = particle2[j]->getPos().x - particle1[i]->getPos().x;
+			float dy = particle2[j]->getPos().y - particle1[i]->getPos().y;
+			float dz = particle2[j]->getPos().z - particle1[i]->getPos().z;
 			float distance = sqrt(dx * dx + dy * dy + dz * dz);
 
 			if (distance > 0 && distance < this->distanceMax)
 			{
-				//const float f = this->force(distance / this->distanceMax, attraction);
+				const float f = this->force(distance / this->distanceMax, attraction);
 
-				fx += dx / distance * attraction;
-				fy += dy / distance * attraction;
-				fz += dz / distance * attraction;
+				fx += dx / distance * f;
+				fy += dy / distance * f;
+				fz += dz / distance * f;
+
 			}
 		}
 
-		//fx *= this->distanceMax * 10;
-		//fy *= this->distanceMax * 10;
-		//fz *= this->distanceMax * 10;
+		fx *= this->distanceMax;
+		fy *= this->distanceMax;
+		fz *= this->distanceMax;
 
 		particle1[i]->setVel(glm::vec3(
-			particle1[i]->getVelocity().x * this->friction + fx * this->TIME_STEP,
-			particle1[i]->getVelocity().y * this->friction + fy * this->TIME_STEP,
-			particle1[i]->getVelocity().z * this->friction + fz * this->TIME_STEP
+			particle1[i]->getVelocity().x * this->friction + fx * this->deltaTime/2.f,
+			particle1[i]->getVelocity().y * this->friction + fy * this->deltaTime/2.f,
+			particle1[i]->getVelocity().z * this->friction + fz * this->deltaTime/2.f
 		));
 
 
 		particle1[i]->setPos(glm::vec3(
-			particle1[i]->getPos() + particle1[i]->getVelocity() * this->TIME_STEP
+			particle1[i]->getPos() + particle1[i]->getVelocity() * this->deltaTime/2.f
 		));
 
 
@@ -881,12 +884,13 @@ void Life3D_Engine::Draw()
 		this->DrawCube();
 	}
 
-	this->DrawText(this->textShader, "FPS: " + std::to_string((int)this->FPS), 0.0f, this->WINDOW_HEIGHT - 1 * this->fontSize, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f));
-	this->DrawText(this->textShader, "Pos: " + std::to_string(this->camera.Position.x) + ", " + std::to_string(this->camera.Position.y) + ", " + std::to_string(this->camera.Position.z), 0.0f, this->WINDOW_HEIGHT - 2 * this->fontSize, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f));
-	this->DrawText(this->textShader, "CameraView: " + std::to_string(this->camera.Front.x) + ", " + std::to_string(this->camera.Front.y) + ", " + std::to_string(this->camera.Front.z), 0.0f, this->WINDOW_HEIGHT - 3 * this->fontSize, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f));
+	this->DrawText(this->textShader, "FPS: " + std::to_string((int)this->FPS), 0.0f, (float)this->WINDOW_HEIGHT - 1 * (float)this->fontSize, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f));
+	this->DrawText(this->textShader, "Pos: " + std::to_string(this->camera.Position.x) + ", " + std::to_string(this->camera.Position.y) + ", " + std::to_string(this->camera.Position.z), 0.0f, (float)this->WINDOW_HEIGHT - 2 * (float)this->fontSize, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f));
+	this->DrawText(this->textShader, "CameraView: " + std::to_string(this->camera.Front.x) + ", " + std::to_string(this->camera.Front.y) + ", " + std::to_string(this->camera.Front.z), 0.0f, (float)this->WINDOW_HEIGHT - 3 * (float)this->fontSize, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f));
+	this->DrawText(this->textShader, "DeltaTime: " + std::to_string(this->deltaTime), 0.0f, (float)this->WINDOW_HEIGHT - 4 * (float)this->fontSize, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f));
 
 	this->DrawSettings();
-
+	ImGui::EndFrame();
 }
 
 void Life3D_Engine::DrawScene()
@@ -905,6 +909,8 @@ void Life3D_Engine::DrawScene()
 	this->particleShader.setVec3("lightPos", glm::vec3(20.0, 20.0, 20.0));
 	this->particleShader.setVec3("viewPos", camera.Position);
 	this->particleShader.setInt("shininess", 256);
+	this->particleShader.setInt("shaderChoice", this->shaderChoice);
+
 
 	int k = 0;
 	for (int i = 0; i < this->particles.size(); i++)
@@ -952,20 +958,20 @@ void Life3D_Engine::DrawSettings()
 		ImGui::SetWindowPos(pos);
 
 		// Fenstergröße setzen
-		ImVec2 size(this->WINDOW_WIDTH / 4, WINDOW_HEIGHT * 0.9);
+		ImVec2 size((float)this->WINDOW_WIDTH / 4, (float)this->WINDOW_HEIGHT * 0.9f);
 		ImGui::SetWindowSize(size);
 		ImGui::Text("Settings");
-		ImGui::SetNextItemWidth(this->WINDOW_WIDTH / 5);
+		ImGui::SetNextItemWidth((float)this->WINDOW_WIDTH / 5);
 		ImGui::SliderFloat("Velocity", &this->velocity, 0.0f, 1.0f);
-		ImGui::SetNextItemWidth(this->WINDOW_WIDTH / 5);
+		ImGui::SetNextItemWidth((float)this->WINDOW_WIDTH / 5);
 		ImGui::SliderFloat("Distance", &this->distanceMax, 0.0f, 700.0f);
-		ImGui::SetNextItemWidth(this->WINDOW_WIDTH / 5);
+		ImGui::SetNextItemWidth((float)this->WINDOW_WIDTH / 5);
 		ImGui::SliderFloat("Scale", &this->scale, 0.00f, 2.0f);
-		ImGui::SetNextItemWidth(this->WINDOW_WIDTH / 5);
+		ImGui::SetNextItemWidth((float)this->WINDOW_WIDTH / 5);
 		ImGui::SliderFloat("Friction", &this->friction, 0.00f, 1.0f);
-		ImGui::SetNextItemWidth(this->WINDOW_WIDTH / 5);
+		ImGui::SetNextItemWidth((float)this->WINDOW_WIDTH / 5);
 		ImGui::SliderFloat("Boxsize", &this->cubeSize, 1.0f, 700.0f);
-		ImGui::SetNextItemWidth(this->WINDOW_WIDTH / 5);
+		ImGui::SetNextItemWidth((float)this->WINDOW_WIDTH / 5);
 		ImGui::SliderFloat("Camspeed", &this->cameraSpeed, 1.0f, 400.0f);
 		if (ImGui::Button("Random")) {
 			for (int i = 0; i < 5; i++)
@@ -1002,9 +1008,9 @@ void Life3D_Engine::DrawSettings()
 			{
 				for (auto* particle : this->particles[i])
 				{
-					int posX = random(this->cubeSize * 2, -this->cubeSize);
-					int posY = random(this->cubeSize * 2, -this->cubeSize);
-					int posZ = random(this->cubeSize * 2, -this->cubeSize);
+					int posX = random((int)this->cubeSize * 2, -(int)this->cubeSize);
+					int posY = random((int)this->cubeSize * 2, -(int)this->cubeSize);
+					int posZ = random((int)this->cubeSize * 2, -(int)this->cubeSize);
 					particle->setPos(glm::vec3(posX, posY, posZ));
 					p++;
 				}
@@ -1043,6 +1049,16 @@ void Life3D_Engine::DrawSettings()
 		if (ImGui::Button("Normal"))
 		{
 			this->postProcessingChoice = 7;
+		}
+		ImGui::Text("Shaderwahl");
+		if (ImGui::Button("DirLightShading"))
+		{
+			this->shaderChoice = 0;
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("NormalShading"))
+		{
+			this->shaderChoice = 1;
 		}
 		ImGui::Text("Rot");
 		ImGui::SliderFloat("rr", &this->attraction[0][0], -1.0f, 1.0f);
@@ -1093,6 +1109,7 @@ void Life3D_Engine::DrawScreen()
 	this->screenShader.use();
 	this->screenShader.setInt("screenTexture", 0);
 	this->screenShader.setInt("choice", this->postProcessingChoice);
+
 	glActiveTexture(GL_TEXTURE0);
 	glBindVertexArray(this->screenVAO);
 	glDisable(GL_DEPTH_TEST);

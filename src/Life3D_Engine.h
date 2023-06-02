@@ -98,6 +98,7 @@ private:
 	//Settings
 	int amount;
 	int postProcessingChoice;
+	int shaderChoice;
 
 	float velocity;
 	float distanceMax;
