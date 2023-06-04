@@ -135,7 +135,6 @@ private:
 	unsigned int colorVBO;
 
 	//Vertices
-	float* cubemapVertices;
 	float* quadVertices;
 	float* cubeVertices;
 

@@ -2,14 +2,14 @@
 #include <thread>
 #include <random>
 
-// Grundfarben
+// Base Colors
 #define RED glm::vec3(1.0f, 0.0f, 0.0f)
 #define GREEN glm::vec3(0.0f, 1.0f, 0.0f)
 #define BLUE glm::vec3(0.0f, 0.0f, 1.0f)
 #define WHITE glm::vec3(1.0f, 1.0f, 1.0f)
 #define BLACK glm::vec3(0.0f, 0.0f, 0.0f)
 
-// Benutzerdefinierte Farben
+// Custom Colors
 #define ORANGE glm::vec3(1.0f, 0.5f, 0.0f)
 #define PURPLE glm::vec3(0.5f, 0.0f, 0.5f)
 #define YELLOW glm::vec3(1.0f, 1.0f, 0.0f)
@@ -17,21 +17,21 @@
 #define MAGENTA glm::vec3(1.0f, 0.0f, 1.0f)
 
 
-// Pastellfarben
+// Pastell Colors
 #define PASTEL_PINK glm::vec3(0.86f, 0.63f, 0.69f)
 #define PASTEL_YELLOW glm::vec3(0.95f, 0.95f, 0.58f)
 #define PASTEL_BLUE glm::vec3(0.62f, 0.77f, 0.87f)
 #define PASTEL_GREEN glm::vec3(0.64f, 0.87f, 0.68f)
 #define PASTEL_PURPLE glm::vec3(0.73f, 0.62f, 0.81f)
 
-// Metallische Farben
+// Metallic Colors
 #define GOLD glm::vec3(1.0f, 0.84f, 0.0f)
 #define SILVER glm::vec3(0.75f, 0.75f, 0.75f)
 #define BRONZE glm::vec3(0.8f, 0.5f, 0.2f)
 #define COPPER glm::vec3(0.85f, 0.55f, 0.4f)
 #define STEEL glm::vec3(0.6f, 0.6f, 0.67f)
 
-// Regenbogenfarben
+// Rainbow Colors
 #define VIOLET glm::vec3(0.5f, 0.0f, 1.0f)
 #define INDIGO glm::vec3(0.29f, 0.0f, 0.51f)
 #define BLUE_GREEN glm::vec3(0.0f, 0.5f, 0.5f)
@@ -39,14 +39,14 @@
 #define YELLOW_ORANGE glm::vec3(1.0f, 0.71f, 0.0f)
 #define RED_ORANGE glm::vec3(1.0f, 0.27f, 0.0f)
 
-// Erdtöne
+// Earth Tones
 #define BROWN glm::vec3(0.65f, 0.16f, 0.16f)
 #define SAND glm::vec3(0.76f, 0.7f, 0.5f)
 #define OLIVE glm::vec3(0.5f, 0.5f, 0.0f)
 #define MOSS_GREEN glm::vec3(0.55f, 0.64f, 0.45f)
 #define SLATE_GRAY glm::vec3(0.44f, 0.5f, 0.56f)
 
-// Neonfarben
+// Neon Colors
 #define NEON_PINK glm::vec3(1.0f, 0.07f, 0.55f)
 #define NEON_YELLOW glm::vec3(1.0f, 0.95f, 0.0f)
 #define NEON_GREEN glm::vec3(0.29f, 0.95f, 0.29f)
@@ -54,7 +54,7 @@
 #define NEON_PURPLE glm::vec3(0.67f, 0.29f, 0.95f)
 
 
-//Konstruktor
+//Constructor
 Life3D_Engine::Life3D_Engine()
 {
 	this->initWindow();
@@ -64,6 +64,7 @@ Life3D_Engine::Life3D_Engine()
 	this->initFont();
 	this->initVariables();
 	this->initCamera();
+
 	this->sphere = new Model(".\\resources\\models\\sphere\\sphere.obj");
 	this->cube = new Model(".\\resources\\models\\cube\\cube.obj");
 	this->lightSource = new Model(".\\resources\\models\\sphere\\sphere.obj");
@@ -73,22 +74,6 @@ Life3D_Engine::Life3D_Engine()
 	this->blue = this->create(amount, BLUE);
 	this->yellow = this->create(amount, YELLOW);
 	this->white = this->create(amount, WHITE);
-
-	std::random_device rd;
-	std::mt19937 gen(rd()); 
-	std::uniform_real_distribution<float> dis(0.0f, 1.0f);
-
-	glm::vec3* rColors = new glm::vec3[this->amount * 5];
-
-	for (int i = 0; i < this->amount * 5-1; i++) {
-		rColors[i] = glm::vec3(dis(gen), dis(gen), dis(gen));
-	}
-
-	this->randomColors = new glm::vec3[this->amount * 5];
-	std::memcpy(this->randomColors, rColors, sizeof(glm::vec3) * (this->amount * 5));
-	delete[] rColors;
-
-
 
 	this->initBuffer();
 
@@ -120,6 +105,7 @@ void Life3D_Engine::run()
 		glfwSwapBuffers(this->window);
 		glfwPollEvents();
 	}
+
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
@@ -130,13 +116,12 @@ void Life3D_Engine::run()
 
 int Life3D_Engine::initWindow()
 {
-	//Initialisiere GLFW und mache Version 3.3 und Core bekannt
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	//Erstelle window und setze den Kontext darauf
+	//Create window and context
 	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 	const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 	this->WINDOW_WIDTH = mode->width;
@@ -153,23 +138,21 @@ int Life3D_Engine::initWindow()
 		return -1;
 	}
 
-	//Lade GlAD
+	//Load GlAD
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
 		cout << "Failed to initialize GLAD" << endl;
 		return -1;
 	}
 
-	//definiere OpenGL Viewport
+	//define OpenGL Viewport
 	glViewport(0, 0, this->WINDOW_WIDTH, this->WINDOW_HEIGHT);
 
-	//Rezising des Fensters soll auch den Viewport anpassen
+	//Rezising should affect Viewport
 	glfwSetFramebufferSizeCallback(this->window, framebuffer_size_callback_wrapper);
 
-	// Das User Pointer wird auf eine Instanz der Klasse gesetzt
 	glfwSetWindowUserPointer(window, this);
 
-	// Die Wrapper-Funktion wird als Callback für die Mausbewegungen festgelegt
 	glfwSetCursorPosCallback(window, mouse_callback_wrapper);
 
 	return 0;
@@ -186,53 +169,6 @@ void Life3D_Engine::initCamera()
 
 void Life3D_Engine::initVertices()
 {
-	float cmVertices[] = {
-		-1.0f, 1.0f, -1.0f,
-			-1.0f, -1.0f, -1.0f,
-			1.0f, -1.0f, -1.0f,
-			1.0f, -1.0f, -1.0f,
-			1.0f, 1.0f, -1.0f,
-			-1.0f, 1.0f, -1.0f,
-
-			-1.0f, -1.0f, 1.0f,
-			-1.0f, -1.0f, -1.0f,
-			-1.0f, 1.0f, -1.0f,
-			-1.0f, 1.0f, -1.0f,
-			-1.0f, 1.0f, 1.0f,
-			-1.0f, -1.0f, 1.0f,
-
-			1.0f, -1.0f, -1.0f,
-			1.0f, -1.0f, 1.0f,
-			1.0f, 1.0f, 1.0f,
-			1.0f, 1.0f, 1.0f,
-			1.0f, 1.0f, -1.0f,
-			1.0f, -1.0f, -1.0f,
-
-			-1.0f, -1.0f, 1.0f,
-			-1.0f, 1.0f, 1.0f,
-			1.0f, 1.0f, 1.0f,
-			1.0f, 1.0f, 1.0f,
-			1.0f, -1.0f, 1.0f,
-			-1.0f, -1.0f, 1.0f,
-
-			-1.0f, 1.0f, -1.0f,
-			1.0f, 1.0f, -1.0f,
-			1.0f, 1.0f, 1.0f,
-			1.0f, 1.0f, 1.0f,
-			-1.0f, 1.0f, 1.0f,
-			-1.0f, 1.0f, -1.0f,
-
-			-1.0f, -1.0f, -1.0f,
-			-1.0f, -1.0f, 1.0f,
-			1.0f, -1.0f, -1.0f,
-			1.0f, -1.0f, -1.0f,
-			-1.0f, -1.0f, 1.0f,
-			1.0f, -1.0f, 1.0f
-	};
-	this->cubemapVertices = new float[3 * 36];
-	std::memcpy(this->cubemapVertices, cmVertices, sizeof(cmVertices));
-
-
 	float qVertices[] = {
 		// positions // texCoords
 		-1.0f,  1.0f,  0.0f, 1.0f,
@@ -243,7 +179,7 @@ void Life3D_Engine::initVertices()
 		 1.0f, -1.0f,  1.0f, 0.0f,
 		 1.0f,  1.0f,  1.0f, 1.0f
 	};
-	this->quadVertices = new float[6 * 4]; // Annahme: quadVertices hat genug Platz für die Daten
+	this->quadVertices = new float[6 * 4];
 
 	std::memcpy(this->quadVertices, qVertices, sizeof(qVertices));
 
@@ -323,12 +259,11 @@ void Life3D_Engine::initBuffer()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->texColorBuffer, 0);
 
-	// create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
+	// create a renderbuffer object for depth and stencil attachment
 	glGenRenderbuffers(1, &this->rbo);
 	glBindRenderbuffer(GL_RENDERBUFFER, this->rbo);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, this->WINDOW_WIDTH, this->WINDOW_HEIGHT); // use a single renderbuffer object for both a depth AND stencil buffer.
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, this->rbo); // now actually attach it
-	// now that we actually created the framebuffer and added all attachments we want to check if it is actually complete now
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, this->WINDOW_WIDTH, this->WINDOW_HEIGHT);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, this->rbo); 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << endl;
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -342,9 +277,6 @@ void Life3D_Engine::initBuffer()
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
-
-
-
 
 	glGenBuffers(1, &instanceVBO);
 	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
@@ -375,6 +307,7 @@ void Life3D_Engine::initBuffer()
 	glBindBuffer(GL_ARRAY_BUFFER, this->colorVBO);
 	glBufferData(GL_ARRAY_BUFFER, this->colorData.size() * sizeof(glm::vec3), &this->colorData[0], GL_STATIC_DRAW);
 
+	//Init ColorVAOs
 	for (unsigned int i = 0; i < this->sphere->meshes.size(); i++)
 	{
 		unsigned int VAO = this->sphere->meshes[i].VAO;
@@ -459,13 +392,13 @@ void Life3D_Engine::initFont()
 
 void Life3D_Engine::initVariables()
 {
-	this->timeFactor = 0.2f;
+	this->timeFactor = 0.7f;
 
 	this->amount = 2000;
 	this->postProcessingChoice = 7;
 	this->shaderChoice = 1;
 	this->distanceMax = 150.0f;
-	this->scale = 0.6f;
+	this->scale = 0.5f;
 	this->cubeSize = 250.0f;
 	this->cameraSpeed = 200.0f;
 
@@ -594,6 +527,7 @@ void Life3D_Engine::scroll_callback_wrapper(GLFWwindow* window, double xoffset, 
 
 unsigned int Life3D_Engine::loadTexture(char const* path)
 {
+	// @JoeyDeVries
 	unsigned int textureID;
 	glGenTextures(1, &textureID);
 
@@ -662,6 +596,7 @@ int Life3D_Engine::random(int range, int start)
 
 float Life3D_Engine::force(float r, float a)
 {
+	//@ Tom Mohr
 	const float beta = 0.3f;
 	if (r < beta)
 	{
@@ -685,24 +620,22 @@ void Life3D_Engine::update()
 
 	if (this->start)
 	{
-		std::vector<std::thread> threads; // Vektor für die Thread-Objekte
+		//Multithreading for optimization
+		std::vector<std::thread> threads;
 
-//#pragma omp parallel for
 		for (int i = 0; i < 5; i++)
 		{
 			for (int j = 0; j < 5; j++)
 			{
-				// Lambda-Funktion für die Multithreading-Berechnung
 				auto threadFunc = [this, i, j]() {
 					this->updateInteraction(this->particles[i], this->particles[j], this->attraction[i][j]);
 				};
 
-				// Erstellen des thread-Objekts und Hinzufügen zum Vektor
 				threads.emplace_back(threadFunc);
 			}
 		}
 
-		// Warten, bis alle Threads beendet sind
+		// Wait until all threads are finished
 		for (auto& thread : threads)
 		{
 			thread.join();
@@ -711,7 +644,6 @@ void Life3D_Engine::update()
 		//{
 		//	for (int j = 0; j < 5; j++)
 		//	{
-
 		//		this->updateInteraction(this->particles[i], this->particles[j], this->attraction[i][j]);
 		//	}
 		//}
@@ -802,11 +734,8 @@ void Life3D_Engine::updateInteraction(std::vector<Life3D_Particles*> particle1, 
 			particle1[i]->getPos() + particle1[i]->getVelocity() * this->deltaTime/((float)this->amount / 1000) * this->timeFactor
 		));
 
-
-
-
 		//Borders
-		//x -wie ma
+		//x -
 		if (particle1[i]->getPos().x <= -cubeSize)
 		{
 			particle1[i]->setVel(glm::vec3(
@@ -919,9 +848,8 @@ void Life3D_Engine::Draw()
 	{
 		this->DrawCube();
 	}
-
-
-
+	
+	//Render Text
 	this->DrawText(this->textShader, "FPS: " + std::to_string((int)this->FPS), 0.0f, (float)this->WINDOW_HEIGHT - 1 * (float)this->fontSize, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f));
 	this->DrawText(this->textShader, "Pos: " + std::to_string(this->camera.Position.x) + ", " + std::to_string(this->camera.Position.y) + ", " + std::to_string(this->camera.Position.z), 0.0f, (float)this->WINDOW_HEIGHT - 2 * (float)this->fontSize, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f));
 	this->DrawText(this->textShader, "CameraView: " + std::to_string(this->camera.Front.x) + ", " + std::to_string(this->camera.Front.y) + ", " + std::to_string(this->camera.Front.z), 0.0f, (float)this->WINDOW_HEIGHT - 3 * (float)this->fontSize, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f));
@@ -937,6 +865,7 @@ void Life3D_Engine::DrawScene()
 	//Updates
 	this->projection = glm::perspective(glm::radians(this->camera.Zoom), (float)this->WINDOW_WIDTH / (float)this->WINDOW_HEIGHT, 0.1f, 10000.0f);
 	this->view = camera.GetViewMatrix();
+
 	this->particleShader.use();
 	this->particleShader.setMat4("projection", this->projection);
 	this->particleShader.setMat4("view", this->view);
@@ -946,9 +875,9 @@ void Life3D_Engine::DrawScene()
 	this->particleShader.setVec3("lightColor", glm::vec3(BLACK));
 	this->particleShader.setVec3("lightPos", this->dirLightPos);
 	this->particleShader.setVec3("viewPos", camera.Position);
+
 	this->particleShader.setInt("shininess", 256);
 	this->particleShader.setInt("shaderChoice", this->shaderChoice);
-
 
 	int k = 0;
 	for (int i = 0; i < this->particles.size(); i++)
@@ -960,7 +889,7 @@ void Life3D_Engine::DrawScene()
 		}
 	}
 
-	//Batchupdates der Transformationsmatrizen
+	//Batchupdates for transformation matrizes
 	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, 5 * this->amount * sizeof(glm::mat4), &modelMatrices[0]);
 
@@ -982,24 +911,26 @@ void Life3D_Engine::DrawScene()
 	}
 	glBindVertexArray(0);
 
-	//Zeichne Sonne
+	//Draw sun
 	if (this->shaderChoice == 0)
 	{
+		float lichtBahnRadius = this->cubeSize * 4.f;
 		float sinAngleHor = sin(angleHor);
 		float cosAngleHor = cos(angleHor);
 		float sinAngleVer = sin(angleVer); 
 		float cosAngleVer = cos(angleVer); 
-		float lichtBahnRadius = this->cubeSize * 4.f;
+
 		float lightX = sinAngleHor * sinAngleVer * lichtBahnRadius; 
 		float lightY = cosAngleVer * lichtBahnRadius; 
 		float lightZ = cosAngleHor * sinAngleVer * lichtBahnRadius; 
-		this->dirLightPos = glm::vec3(lightX, lightY, lightZ);
 
+		this->dirLightPos = glm::vec3(lightX, lightY, lightZ);
 
 		this->cubeShader.use();
 		this->cubeShader.setMat4("projection", this->projection);
 		this->cubeShader.setMat4("view", this->view);
 		this->cubeShader.setBool("sphere", true);
+
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, this->dirLightPos);
 		model = glm::scale(model, glm::vec3(40.f));
@@ -1021,10 +952,12 @@ void Life3D_Engine::DrawSettings()
 		ImVec2 pos(5, 50);
 		ImGui::SetWindowPos(pos);
 
-		// Fenstergröße setzen
+		// Init Settingswindow
 		ImVec2 size((float)this->WINDOW_WIDTH / 4, (float)this->WINDOW_HEIGHT * 0.9f);
+
 		ImGui::SetWindowSize(size);
 		ImGui::Text("Settings");
+
 		ImGui::SetNextItemWidth((float)this->WINDOW_WIDTH / 5);
 		ImGui::SliderFloat("Timefactor", &this->timeFactor, 0.0f, 1.0f);
 		ImGui::SetNextItemWidth((float)this->WINDOW_WIDTH / 5);
@@ -1035,6 +968,7 @@ void Life3D_Engine::DrawSettings()
 		ImGui::SliderFloat("Boxsize", &this->cubeSize, 1.0f, 700.0f);
 		ImGui::SetNextItemWidth((float)this->WINDOW_WIDTH / 5);
 		ImGui::SliderFloat("Camspeed", &this->cameraSpeed, 1.0f, 400.0f);
+
 		if (ImGui::Button("Random")) {
 			for (int i = 0; i < 5; i++)
 			{
@@ -1125,6 +1059,7 @@ void Life3D_Engine::DrawSettings()
 		ImGui::SameLine();
 		if (ImGui::Button("RandomColors"))
 		{
+			//Random number generator [0;1]
 			std::random_device rd;
 			std::mt19937 gen(rd());
 			std::uniform_real_distribution<float> dis(0.0f, 1.0f);
@@ -1139,6 +1074,7 @@ void Life3D_Engine::DrawSettings()
 			std::memcpy(this->randomColors, rColors, sizeof(glm::vec3) * (this->amount * 5));
 			delete[] rColors;
 
+			//Update colorVBO
 			glBindBuffer(GL_ARRAY_BUFFER, this->colorVBO);
 			glBufferSubData(GL_ARRAY_BUFFER, 0, 5*amount *sizeof(glm::vec3), &this->randomColors[0]);
 		}		
@@ -1154,24 +1090,28 @@ void Life3D_Engine::DrawSettings()
 		ImGui::SliderFloat("rb", &this->attraction[0][2], -1.0f, 1.0f);											
 		ImGui::SliderFloat("ry", &this->attraction[0][3], -1.0f, 1.0f);
 		ImGui::SliderFloat("rw", &this->attraction[0][4], -1.0f, 1.0f);
+
 		ImGui::Text("Gruen");
 		ImGui::SliderFloat("gr", &this->attraction[1][0], -1.0f, 1.0f);
 		ImGui::SliderFloat("gg", &this->attraction[1][1], -1.0f, 1.0f);
 		ImGui::SliderFloat("gb", &this->attraction[1][2], -1.0f, 1.0f);
 		ImGui::SliderFloat("gy", &this->attraction[1][3], -1.0f, 1.0f);
 		ImGui::SliderFloat("gw", &this->attraction[1][4], -1.0f, 1.0f);
+
 		ImGui::Text("Blau");
 		ImGui::SliderFloat("br", &this->attraction[2][0], -1.0f, 1.0f);
 		ImGui::SliderFloat("bg", &this->attraction[2][1], -1.0f, 1.0f);
 		ImGui::SliderFloat("bb", &this->attraction[2][2], -1.0f, 1.0f);
 		ImGui::SliderFloat("by", &this->attraction[2][3], -1.0f, 1.0f);
 		ImGui::SliderFloat("bw", &this->attraction[2][4], -1.0f, 1.0f);
+
 		ImGui::Text("Gelb");
 		ImGui::SliderFloat("yr", &this->attraction[3][0], -1.0f, 1.0f);
 		ImGui::SliderFloat("yg", &this->attraction[3][1], -1.0f, 1.0f);
 		ImGui::SliderFloat("yb", &this->attraction[3][2], -1.0f, 1.0f);
 		ImGui::SliderFloat("yy", &this->attraction[3][3], -1.0f, 1.0f);
 		ImGui::SliderFloat("yw", &this->attraction[3][4], -1.0f, 1.0f);
+
 		ImGui::Text("Weiss");
 		ImGui::SliderFloat("wr", &this->attraction[4][0], -1.0f, 1.0f);
 		ImGui::SliderFloat("wg", &this->attraction[4][1], -1.0f, 1.0f);
@@ -1188,8 +1128,6 @@ void Life3D_Engine::DrawSettings()
 
 void Life3D_Engine::DrawScreen()
 {
-
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -1213,7 +1151,7 @@ void Life3D_Engine::DrawCube()
 
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(1.0f));
-	float scaleFactor = this->cubeSize; // Skalierungsfaktor berechnen
+	float scaleFactor = this->cubeSize; 
 	model = glm::scale(model, glm::vec3(scaleFactor));
 	this->cubeShader.setMat4("model", model);
 	this->cubeShader.setVec3("color", BLUE_GREEN);
@@ -1224,7 +1162,7 @@ void Life3D_Engine::DrawCube()
 
 void Life3D_Engine::DrawText(Shader& s, std::string text, float x, float y, float scale, glm::vec3 color)
 {
-
+	//@ JoeyDeVries
 	// activate corresponding render state	
 	s.use();
 	s.setVec3("textColor", color);
