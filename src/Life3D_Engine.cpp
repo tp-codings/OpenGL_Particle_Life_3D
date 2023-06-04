@@ -408,6 +408,7 @@ void Life3D_Engine::initVariables()
 
 	this->start = false;
 	this->showBorder = false;
+	this->borders = true;
 	this->viewMode = true;
 
 	this->frameCount = 0;
@@ -736,96 +737,99 @@ void Life3D_Engine::updateInteraction(std::vector<Life3D_Particles*> particle1, 
 
 		//Borders
 		//x -
-		if (particle1[i]->getPos().x <= -cubeSize)
+		if (this->borders)
 		{
-			particle1[i]->setVel(glm::vec3(
-				particle1[i]->getVelocity().x * -1,
-				particle1[i]->getVelocity().y,
-				particle1[i]->getVelocity().z
-			));
+			if (particle1[i]->getPos().x <= -cubeSize)
+			{
+				particle1[i]->setVel(glm::vec3(
+					particle1[i]->getVelocity().x * -1,
+					particle1[i]->getVelocity().y,
+					particle1[i]->getVelocity().z
+				));
 
-			particle1[i]->setPos(glm::vec3(
-				-cubeSize + 1,
-				particle1[i]->getPos().y,
-				particle1[i]->getPos().z
-			));
-		}
-		//x +
-		if (particle1[i]->getPos().x >= cubeSize)
-		{
-			particle1[i]->setVel(glm::vec3(
-				particle1[i]->getVelocity().x * -1,
-				particle1[i]->getVelocity().y,
-				particle1[i]->getVelocity().z
-			));
+				particle1[i]->setPos(glm::vec3(
+					-cubeSize + 1,
+					particle1[i]->getPos().y,
+					particle1[i]->getPos().z
+				));
+			}
+			//x +
+			if (particle1[i]->getPos().x >= cubeSize)
+			{
+				particle1[i]->setVel(glm::vec3(
+					particle1[i]->getVelocity().x * -1,
+					particle1[i]->getVelocity().y,
+					particle1[i]->getVelocity().z
+				));
 
-			particle1[i]->setPos(glm::vec3(
-				cubeSize - 5,
-				particle1[i]->getPos().y,
-				particle1[i]->getPos().z
-			));
-		}
+				particle1[i]->setPos(glm::vec3(
+					cubeSize - 5,
+					particle1[i]->getPos().y,
+					particle1[i]->getPos().z
+				));
+			}
 
-		//y -
-		if (particle1[i]->getPos().y <= -cubeSize)
-		{
-			particle1[i]->setVel(glm::vec3(
-				particle1[i]->getVelocity().x,
-				particle1[i]->getVelocity().y * -1,
-				particle1[i]->getVelocity().z
-			));
+			//y -
+			if (particle1[i]->getPos().y <= -cubeSize)
+			{
+				particle1[i]->setVel(glm::vec3(
+					particle1[i]->getVelocity().x,
+					particle1[i]->getVelocity().y * -1,
+					particle1[i]->getVelocity().z
+				));
 
-			particle1[i]->setPos(glm::vec3(
-				particle1[i]->getPos().x,
-				-cubeSize + 1,
-				particle1[i]->getPos().z
-			));
-		}
-		//y +
-		if (particle1[i]->getPos().y >= cubeSize)
-		{
-			particle1[i]->setVel(glm::vec3(
-				particle1[i]->getVelocity().x,
-				particle1[i]->getVelocity().y * -1,
-				particle1[i]->getVelocity().z
-			));
+				particle1[i]->setPos(glm::vec3(
+					particle1[i]->getPos().x,
+					-cubeSize + 1,
+					particle1[i]->getPos().z
+				));
+			}
+			//y +
+			if (particle1[i]->getPos().y >= cubeSize)
+			{
+				particle1[i]->setVel(glm::vec3(
+					particle1[i]->getVelocity().x,
+					particle1[i]->getVelocity().y * -1,
+					particle1[i]->getVelocity().z
+				));
 
-			particle1[i]->setPos(glm::vec3(
-				particle1[i]->getPos().x,
-				cubeSize - 5,
-				particle1[i]->getPos().z
-			));
-		}
+				particle1[i]->setPos(glm::vec3(
+					particle1[i]->getPos().x,
+					cubeSize - 5,
+					particle1[i]->getPos().z
+				));
+			}
 
-		//z -
-		if (particle1[i]->getPos().z <= -cubeSize)
-		{
-			particle1[i]->setVel(glm::vec3(
-				particle1[i]->getVelocity().x,
-				particle1[i]->getVelocity().y,
-				particle1[i]->getVelocity().z * -1
-			));
+			//z -
+			if (particle1[i]->getPos().z <= -cubeSize)
+			{
+				particle1[i]->setVel(glm::vec3(
+					particle1[i]->getVelocity().x,
+					particle1[i]->getVelocity().y,
+					particle1[i]->getVelocity().z * -1
+				));
 
-			particle1[i]->setPos(glm::vec3(
-				particle1[i]->getPos().x,
-				particle1[i]->getPos().y,
-				-cubeSize + 1
-			));
-		}
-		//z +
-		if (particle1[i]->getPos().z >= cubeSize)
-		{
-			particle1[i]->setVel(glm::vec3(
-				particle1[i]->getVelocity().x,
-				particle1[i]->getVelocity().y,
-				particle1[i]->getVelocity().z * -1
-			));
+				particle1[i]->setPos(glm::vec3(
+					particle1[i]->getPos().x,
+					particle1[i]->getPos().y,
+					-cubeSize + 1
+				));
+			}
+			//z +
+			if (particle1[i]->getPos().z >= cubeSize)
+			{
+				particle1[i]->setVel(glm::vec3(
+					particle1[i]->getVelocity().x,
+					particle1[i]->getVelocity().y,
+					particle1[i]->getVelocity().z * -1
+				));
 
-			particle1[i]->setPos(glm::vec3(
-				particle1[i]->getPos().x,
-				particle1[i]->getPos().y,
-				cubeSize - 5
-			));
+				particle1[i]->setPos(glm::vec3(
+					particle1[i]->getPos().x,
+					particle1[i]->getPos().y,
+					cubeSize - 5
+				));
+			}
 		}
 	}
 }
@@ -1012,7 +1016,7 @@ void Life3D_Engine::DrawSettings()
 				}
 			}
 		}
-		ImGui::SameLine();
+	
 		if (ImGui::Button("Show Border"))
 		{
 			if (showBorder) {
@@ -1020,6 +1024,16 @@ void Life3D_Engine::DrawSettings()
 			}
 			else
 				this->showBorder = true;
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Borders"))
+		{
+			this->borders = true;
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("No Borders"))
+		{
+			this->borders = false;
 		}
 		ImGui::Text("Postprocessing");
 		if (ImGui::Button("Blur"))

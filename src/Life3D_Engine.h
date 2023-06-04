@@ -118,6 +118,7 @@ private:
 	bool viewMode;
 	bool start;
 	bool showBorder;
+	bool borders;
 
 	ImVec4 dirLightColor;
 
