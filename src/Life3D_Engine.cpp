@@ -394,7 +394,7 @@ void Life3D_Engine::initVariables()
 {
 	this->timeFactor = 0.7f;
 
-	this->amount = 2000;
+	this->amount = 3000;
 	this->postProcessingChoice = 7;
 	this->shaderChoice = 1;
 	this->distanceMax = 150.0f;
