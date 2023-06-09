@@ -120,6 +120,9 @@ private:
 	bool showBorder;
 	bool borders;
 
+	bool startKeyPressed;
+	bool settingsKeyPressed;
+
 	ImVec4 dirLightColor;
 
 	//Framebuffer

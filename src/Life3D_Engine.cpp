@@ -400,7 +400,7 @@ void Life3D_Engine::initVariables()
 	this->distanceMax = 150.0f;
 	this->scale = 0.5f;
 	this->cubeSize = 250.0f;
-	this->cameraSpeed = 200.0f;
+	this->cameraSpeed = 600.0f;
 
 	this->TIME_STEP = 0.2f;
 	this->frictionHalfLife = 0.04f;
@@ -424,6 +424,9 @@ void Life3D_Engine::initVariables()
 	this->projection = glm::mat4(1.0f);
 	this->view = glm::mat4(1.0f);
 	this->textProjection = glm::ortho(0.0f, (float)this->WINDOW_WIDTH, 0.0f, (float)this->WINDOW_HEIGHT);
+
+	this->startKeyPressed = false;
+	this->settingsKeyPressed = false;
 }
 
 //Inputhandling------------------------------------------------------------------------------
@@ -441,16 +444,24 @@ void Life3D_Engine::processInput(GLFWwindow* window, Shader reflectionShader)
 	{
 		glfwSetWindowShouldClose(window, true);
 	}
-	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS && !this->settingsKeyPressed)
 	{
-		this->viewMode = false;
+		this->viewMode = !this->viewMode;
+		this->settingsKeyPressed = true;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_RELEASE)
+	{
+		this->settingsKeyPressed = false;
+	}
+	if (!this->viewMode) {
 		glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	}
-	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
-	{
-		this->viewMode = true;
+	else {
 		glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	}
+
+
 	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
 	{
 		this->angleHor += this->deltaTime;
@@ -466,6 +477,15 @@ void Life3D_Engine::processInput(GLFWwindow* window, Shader reflectionShader)
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
 	{
 		this->angleVer -= this->deltaTime;
+	}
+	if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS && !this->startKeyPressed)
+	{
+		this->start = !this->start;
+		this->startKeyPressed = true;
+	}
+	if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_RELEASE)
+	{
+		this->startKeyPressed = false;
 	}
 
 
@@ -859,6 +879,16 @@ void Life3D_Engine::Draw()
 	this->DrawText(this->textShader, "CameraView: " + std::to_string(this->camera.Front.x) + ", " + std::to_string(this->camera.Front.y) + ", " + std::to_string(this->camera.Front.z), 0.0f, (float)this->WINDOW_HEIGHT - 3 * (float)this->fontSize, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f));
 	this->DrawText(this->textShader, "DeltaTime: " + std::to_string(this->deltaTime), 0.0f, (float)this->WINDOW_HEIGHT - 4 * (float)this->fontSize, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f));
 
+	this->DrawText(this->textShader, "Start: " + std::to_string(this->start), this->WINDOW_WIDTH/2, (float)this->WINDOW_HEIGHT - 1 * (float)this->fontSize, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f));
+	this->DrawText(this->textShader, "Borders: " + std::to_string(this->borders), this->WINDOW_WIDTH/2, (float)this->WINDOW_HEIGHT - 2 * (float)this->fontSize, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f));
+	std::string shading = "NormalShading";
+	if(this->shaderChoice == 0)
+		shading = "DirLightShading";
+	this->DrawText(this->textShader, "Shading: " + shading, this->WINDOW_WIDTH/2, (float)this->WINDOW_HEIGHT - 3 * (float)this->fontSize, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f));
+
+
+
+
 	this->DrawSettings();
 	ImGui::EndFrame();
 }
@@ -971,7 +1001,7 @@ void Life3D_Engine::DrawSettings()
 		ImGui::SetNextItemWidth((float)this->WINDOW_WIDTH / 5);
 		ImGui::SliderFloat("Boxsize", &this->cubeSize, 1.0f, 700.0f);
 		ImGui::SetNextItemWidth((float)this->WINDOW_WIDTH / 5);
-		ImGui::SliderFloat("Camspeed", &this->cameraSpeed, 1.0f, 400.0f);
+		ImGui::SliderFloat("Camspeed", &this->cameraSpeed, 1.0f, 1000.0f);
 
 		if (ImGui::Button("Random")) {
 			for (int i = 0; i < 5; i++)
@@ -981,20 +1011,6 @@ void Life3D_Engine::DrawSettings()
 				}
 			}
 		}
-		ImGui::SameLine();
-		if (ImGui::Button("Zero")) {
-			for (int i = 0; i < 5; i++)
-			{
-				for (int j = 0; j < 5; j++) {
-					this->attraction[i][j] = 0.0;
-				}
-			}
-		}
-		//ImGui::SameLine();
-		//if (ImGui::Button("Start"))
-		//{
-		//	this->start = true;
-		//}
 
 		const char* play = "Start";
 		if (this->start){
