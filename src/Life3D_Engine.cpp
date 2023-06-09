@@ -427,6 +427,10 @@ void Life3D_Engine::initVariables()
 
 	this->startKeyPressed = false;
 	this->settingsKeyPressed = false;
+	this->randomKeyPressed = false;
+	this->randPosKeyPressed = false;
+	this->borderKeyPressed = false;
+
 }
 
 //Inputhandling------------------------------------------------------------------------------
@@ -486,6 +490,34 @@ void Life3D_Engine::processInput(GLFWwindow* window, Shader reflectionShader)
 	if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_RELEASE)
 	{
 		this->startKeyPressed = false;
+	}
+	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS && !this->randomKeyPressed)
+	{
+		this->randomAttraction();
+		this->randomKeyPressed = true;
+	}
+	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_RELEASE)
+	{
+		this->randomKeyPressed = false;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS && !this->randPosKeyPressed)
+	{
+		this->randomPosition();
+		this->randPosKeyPressed = true;
+	}
+	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_RELEASE)
+	{
+		this->randPosKeyPressed = false;
+	}
+	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS && !this->borderKeyPressed)
+	{
+		this->borders = !this->borders;
+		this->borderKeyPressed = true;
+	}
+	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_RELEASE)
+	{
+		this->borderKeyPressed = false;
 	}
 
 
@@ -629,6 +661,32 @@ float Life3D_Engine::force(float r, float a)
 	}
 	else {
 		return 0.0f;
+	}
+}
+
+void Life3D_Engine::randomPosition()
+{
+	int p = 0;
+	for (int i = 0; i < this->particles.size(); i++)
+	{
+		for (auto* particle : this->particles[i])
+		{
+			int posX = random((int)this->cubeSize * 2, -(int)this->cubeSize);
+			int posY = random((int)this->cubeSize * 2, -(int)this->cubeSize);
+			int posZ = random((int)this->cubeSize * 2, -(int)this->cubeSize);
+			particle->setPos(glm::vec3(posX, posY, posZ));
+			p++;
+		}
+	}
+}
+
+void Life3D_Engine::randomAttraction()
+{
+	for (int i = 0; i < 5; i++)
+	{
+		for (int j = 0; j < 5; j++) {
+			this->attraction[i][j] = (float)random(200, -100) / 100;
+		}
 	}
 }
 
@@ -1004,12 +1062,7 @@ void Life3D_Engine::DrawSettings()
 		ImGui::SliderFloat("Camspeed", &this->cameraSpeed, 1.0f, 1000.0f);
 
 		if (ImGui::Button("Random")) {
-			for (int i = 0; i < 5; i++)
-			{
-				for (int j = 0; j < 5; j++) {
-					this->attraction[i][j] = (float)random(200, -100) / 100;
-				}
-			}
+			this->randomAttraction();
 		}
 
 		const char* play = "Start";
@@ -1025,18 +1078,7 @@ void Life3D_Engine::DrawSettings()
 		ImGui::SameLine();
 		if (ImGui::Button("RandomPos"))
 		{
-			int p = 0;
-			for (int i = 0; i < this->particles.size(); i++)
-			{
-				for (auto* particle : this->particles[i])
-				{
-					int posX = random((int)this->cubeSize * 2, -(int)this->cubeSize);
-					int posY = random((int)this->cubeSize * 2, -(int)this->cubeSize);
-					int posZ = random((int)this->cubeSize * 2, -(int)this->cubeSize);
-					particle->setPos(glm::vec3(posX, posY, posZ));
-					p++;
-				}
-			}
+			this->randomPosition();
 		}
 	
 		ImGui::SameLine();

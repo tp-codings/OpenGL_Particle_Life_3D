@@ -122,6 +122,9 @@ private:
 
 	bool startKeyPressed;
 	bool settingsKeyPressed;
+	bool randomKeyPressed;
+	bool randPosKeyPressed;
+	bool borderKeyPressed;
 
 	ImVec4 dirLightColor;
 
@@ -176,6 +179,8 @@ private:
 	std::vector<Life3D_Particles*> create(int number, glm::vec3 color);
 	int random(int range, int start);
 	float force(float x, float a);
+	void randomPosition();
+	void randomAttraction();
 
 	//Updates------------------------------------------------------------------------------
 
