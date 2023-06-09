@@ -394,7 +394,7 @@ void Life3D_Engine::initVariables()
 {
 	this->timeFactor = 0.7f;
 
-	this->amount = 3000;
+	this->amount = 2000;
 	this->postProcessingChoice = 7;
 	this->shaderChoice = 1;
 	this->distanceMax = 150.0f;
@@ -990,16 +990,22 @@ void Life3D_Engine::DrawSettings()
 				}
 			}
 		}
-		ImGui::SameLine();
-		if (ImGui::Button("Start"))
-		{
-			this->start = true;
+		//ImGui::SameLine();
+		//if (ImGui::Button("Start"))
+		//{
+		//	this->start = true;
+		//}
+
+		const char* play = "Start";
+		if (this->start){
+			play = "Stopp";
 		}
 		ImGui::SameLine();
-		if (ImGui::Button("Stopp"))
+		if (ImGui::Button(play))
 		{
-			this->start = false;
+			this->start = !this->start;
 		}
+
 		ImGui::SameLine();
 		if (ImGui::Button("RandomPos"))
 		{
@@ -1017,6 +1023,7 @@ void Life3D_Engine::DrawSettings()
 			}
 		}
 	
+		ImGui::SameLine();
 		if (ImGui::Button("Show Border"))
 		{
 			if (showBorder) {
@@ -1026,15 +1033,15 @@ void Life3D_Engine::DrawSettings()
 				this->showBorder = true;
 		}
 		ImGui::SameLine();
-		if (ImGui::Button("Borders"))
+
+		const char* borderChoice = "Borders";
+		if (this->borders)
+			borderChoice = "No Borders";
+		if (ImGui::Button(borderChoice))
 		{
-			this->borders = true;
+			this->borders = !this->borders;
 		}
-		ImGui::SameLine();
-		if (ImGui::Button("No Borders"))
-		{
-			this->borders = false;
-		}
+
 		ImGui::Text("Postprocessing");
 		if (ImGui::Button("Blur"))
 		{
@@ -1061,15 +1068,15 @@ void Life3D_Engine::DrawSettings()
 			this->postProcessingChoice = 7;
 		}
 		ImGui::Text("Shaderwahl");
-		if (ImGui::Button("DirLightShading"))
+
+		const char* shading = "DirLightShading";
+		if (this->shaderChoice == 0)
+			shading = "NormalShading";
+		if (ImGui::Button(shading))
 		{
-			this->shaderChoice = 0;
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("NormalShading"))
-		{
-			this->shaderChoice = 1;
-		}		
+			this->shaderChoice = ++this->shaderChoice % 2;
+		}	
+
 		ImGui::SameLine();
 		if (ImGui::Button("RandomColors"))
 		{
