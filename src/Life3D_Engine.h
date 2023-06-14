@@ -125,6 +125,7 @@ private:
 	bool randomKeyPressed;
 	bool randPosKeyPressed;
 	bool borderKeyPressed;
+	bool shadingTypeKeyPressed;
 
 	ImVec4 dirLightColor;
 
@@ -187,7 +188,7 @@ private:
 	void update();
 	void updateDeltaTime();
 	void updateCamera();
-	void updateInteraction(std::vector<Life3D_Particles*> particle1, std::vector<Life3D_Particles*> particle2, float attraction);
+	void updateInteraction(std::vector<Life3D_Particles*> particle1, std::vector<Life3D_Particles*>particle2, float attraction);
 
 	//Rendering------------------------------------------------------------------------------
 
@@ -196,6 +197,8 @@ private:
 	void DrawSettings();
 	void DrawScreen();
 	void DrawCube();
-	void DrawText(Shader& s, std::string text, float x, float y, float scale, glm::vec3 color);
+	void DrawText();
+	void RenderText(Shader& s, std::string text, float x, float y, float scale, glm::vec3 color);
+
 };
 
