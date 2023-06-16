@@ -551,6 +551,26 @@ void Life3D_Engine::processInput(GLFWwindow* window, Shader reflectionShader)
 	{
 		this->shadingTypeKeyPressed = false;
 	}
+	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
+	{
+		this->postProcessingChoice = 7;
+	}
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+	{
+		this->postProcessingChoice = 1;
+	}
+	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+	{
+		this->postProcessingChoice = 2;
+	}
+	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+	{
+		this->postProcessingChoice = 3;
+	}
+	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
+	{
+		this->postProcessingChoice = 4;
+	}
 
 	//Kamerabewegung
 	this->updateCamera();
@@ -831,9 +851,9 @@ void Life3D_Engine::updateInteraction(std::vector<Life3D_Particles*> particle1, 
 			{
 				const float f = this->force(distance / this->distanceMax, attraction);
 
-				fx += dx / distance * f;
-				fy += dy / distance * f;
-				fz += dz / distance * f;
+				fx += f * dx / distance;
+				fy += f * dy / distance;
+				fz += f * dz / distance;
 
 			}
 		}
@@ -844,9 +864,9 @@ void Life3D_Engine::updateInteraction(std::vector<Life3D_Particles*> particle1, 
 
 		//Update particle velocity and position
 		particle1[i]->setVel(glm::vec3(
-			particle1[i]->getVelocity().x * this->friction + fx * this->deltaTime/((float)this->amount/1000) * this->timeFactor,
-			particle1[i]->getVelocity().y * this->friction + fy * this->deltaTime/((float)this->amount/1000) * this->timeFactor,
-			particle1[i]->getVelocity().z * this->friction + fz * this->deltaTime/((float)this->amount/1000) * this->timeFactor
+			particle1[i]->getVelocity().x * this->friction + fx * this->deltaTime * this->timeFactor,
+			particle1[i]->getVelocity().y * this->friction + fy * this->deltaTime * this->timeFactor,
+			particle1[i]->getVelocity().z * this->friction + fz * this->deltaTime * this->timeFactor
 		));
 
 		particle1[i]->setPos(glm::vec3(
