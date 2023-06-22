@@ -56,8 +56,8 @@ void main()
             float dirSpec = pow(max(dot(viewDir, dirReflectDir), 0.0), shininess); 
             vec3 dirSpecular = specularStrength * dirSpec * dirLightColor;
     
-           // vec3 result = (ambient + diffuse + specular + dirDiffuse + dirSpecular) * vColor; 
-            vec3 result = (ambient+dirSpecular+dirDiffuse) * vColor; 
+            vec3 result = (ambient + diffuse + specular + dirDiffuse + dirSpecular) * vColor; 
+            //vec3 result = (ambient+dirSpecular+dirDiffuse) * vColor; 
             FragColor = vec4(result, 1.0);
             break;
 

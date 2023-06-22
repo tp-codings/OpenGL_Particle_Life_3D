@@ -61,7 +61,6 @@ Life3D_Engine::Life3D_Engine()
 	this->initWindow();
 	this->initShader();
 	this->initVertices();
-	this->initTextures();
 	this->initFont();
 	this->initVariables();
 	this->initCamera();
@@ -82,12 +81,7 @@ Life3D_Engine::Life3D_Engine()
 	this->initBuffer();
 
 	//Randomize first attraction matrix
-	for (int i = 0; i < 5; i++)
-	{
-		for (int j = 0; j < 5; j++) {
-			this->attraction[i][j] = (float)random(200, -100) / 100;
-		}
-	}
+	this->randomAttraction();
 
 	stbi_set_flip_vertically_on_load(true);
 
@@ -343,10 +337,6 @@ void Life3D_Engine::initShader()
 	this->particleShader = Shader("Shader/particles.vs", "Shader/particles.fs");
 	this->cubeShader = Shader("Shader/cube.vs", "Shader/cube.fs");
 	this->textShader = Shader("Shader/text.vs", "Shader/text.fs");
-}
-
-void Life3D_Engine::initTextures()
-{
 }
 
 void Life3D_Engine::initFont()
@@ -629,50 +619,6 @@ void Life3D_Engine::scroll_callback_wrapper(GLFWwindow* window, double xoffset, 
 
 //Helper------------------------------------------------------------------------------
 
-unsigned int Life3D_Engine::loadTexture(char const* path)
-{
-	// @JoeyDeVries
-	unsigned int textureID;
-	glGenTextures(1, &textureID);
-
-	int width, height, nrComponents;
-	unsigned char* data = stbi_load(path, &width, &height, &nrComponents, 0);
-	if (data)
-	{
-		GLenum format;
-		if (nrComponents == 1)
-			format = GL_RED;
-		else if (nrComponents == 3)
-			format = GL_RGB;
-		else if (nrComponents == 4)
-			format = GL_RGBA;
-
-		glBindTexture(GL_TEXTURE_2D, textureID);
-		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-		if (format = GL_RGBA)
-		{
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		}
-
-		stbi_image_free(data);
-	}
-	else
-	{
-		std::cout << "Texture failed to load at path: " << path << std::endl;
-		stbi_image_free(data);
-	}
-
-	return textureID;
-}
-
 std::vector<Life3D_Particles*> Life3D_Engine::create(int number, glm::vec3 color)
 {
 	//Create particles for a specific type at a random position inside the border box
@@ -699,17 +645,17 @@ int Life3D_Engine::random(int range, int start)
 	return rand() % range + start;
 }
 
-float Life3D_Engine::force(float r, float a)
+float Life3D_Engine::force(float d, float a)
 {
 	//Force function to prevent particles from collapsing into singularity @Tom Mohr
 	const float beta = 0.3f;
-	if (r < beta)
+	if (d < beta)
 	{
-		return r / beta - 1;
+		return d / beta - 1;
 	}
-	else if (beta < r && r < 1)
+	else if (beta < d && d < 1)
 	{
-		return a * (1 - abs(2 * r - 1 - beta) / (1 - beta));
+		return a * (1 - abs(2 * d - 1 - beta) / (1 - beta));
 	}
 	else {
 		return 0.0f;
@@ -874,100 +820,105 @@ void Life3D_Engine::updateInteraction(std::vector<Life3D_Particles*> particle1, 
 		));
 
 		//Borders
-		//x -
-		if (this->borders)
+		this->updateBorders(particle1[i]);
+	}
+}
+
+void Life3D_Engine::updateBorders(Life3D_Particles* particle)
+{
+	//x -
+	if (this->borders)
+	{
+		if (particle->getPos().x <= -cubeSize)
 		{
-			if (particle1[i]->getPos().x <= -cubeSize)
-			{
-				particle1[i]->setVel(glm::vec3(
-					particle1[i]->getVelocity().x * -1,
-					particle1[i]->getVelocity().y,
-					particle1[i]->getVelocity().z
-				));
+			particle->setVel(glm::vec3(
+				particle->getVelocity().x * -1,
+				particle->getVelocity().y,
+				particle->getVelocity().z
+			));
 
-				particle1[i]->setPos(glm::vec3(
-					-cubeSize + 1,
-					particle1[i]->getPos().y,
-					particle1[i]->getPos().z
-				));
-			}
-			//x +
-			if (particle1[i]->getPos().x >= cubeSize)
-			{
-				particle1[i]->setVel(glm::vec3(
-					particle1[i]->getVelocity().x * -1,
-					particle1[i]->getVelocity().y,
-					particle1[i]->getVelocity().z
-				));
+			particle->setPos(glm::vec3(
+				-cubeSize + 1,
+				particle->getPos().y,
+				particle->getPos().z
+			));
+		}
+		//x +
+		if (particle->getPos().x >= cubeSize)
+		{
+			particle->setVel(glm::vec3(
+				particle->getVelocity().x * -1,
+				particle->getVelocity().y,
+				particle->getVelocity().z
+			));
 
-				particle1[i]->setPos(glm::vec3(
-					cubeSize - 5,
-					particle1[i]->getPos().y,
-					particle1[i]->getPos().z
-				));
-			}
+			particle->setPos(glm::vec3(
+				cubeSize - 5,
+				particle->getPos().y,
+				particle->getPos().z
+			));
+		}
 
-			//y -
-			if (particle1[i]->getPos().y <= -cubeSize)
-			{
-				particle1[i]->setVel(glm::vec3(
-					particle1[i]->getVelocity().x,
-					particle1[i]->getVelocity().y * -1,
-					particle1[i]->getVelocity().z
-				));
+		//y -
+		if (particle->getPos().y <= -cubeSize)
+		{
+			particle->setVel(glm::vec3(
+				particle->getVelocity().x,
+				particle->getVelocity().y * -1,
+				particle->getVelocity().z
+			));
 
-				particle1[i]->setPos(glm::vec3(
-					particle1[i]->getPos().x,
-					-cubeSize + 1,
-					particle1[i]->getPos().z
-				));
-			}
-			//y +
-			if (particle1[i]->getPos().y >= cubeSize)
-			{
-				particle1[i]->setVel(glm::vec3(
-					particle1[i]->getVelocity().x,
-					particle1[i]->getVelocity().y * -1,
-					particle1[i]->getVelocity().z
-				));
+			particle->setPos(glm::vec3(
+				particle->getPos().x,
+				-cubeSize + 1,
+				particle->getPos().z
+			));
+		}
+		//y +
+		if (particle->getPos().y >= cubeSize)
+		{
+			particle->setVel(glm::vec3(
+				particle->getVelocity().x,
+				particle->getVelocity().y * -1,
+				particle->getVelocity().z
+			));
 
-				particle1[i]->setPos(glm::vec3(
-					particle1[i]->getPos().x,
-					cubeSize - 5,
-					particle1[i]->getPos().z
-				));
-			}
+			particle->setPos(glm::vec3(
+				particle->getPos().x,
+				cubeSize - 5,
+				particle->getPos().z
+			));
+		}
 
-			//z -
-			if (particle1[i]->getPos().z <= -cubeSize)
-			{
-				particle1[i]->setVel(glm::vec3(
-					particle1[i]->getVelocity().x,
-					particle1[i]->getVelocity().y,
-					particle1[i]->getVelocity().z * -1
-				));
+		//z -
+		if (particle->getPos().z <= -cubeSize)
+		{
+			particle->setVel(glm::vec3(
+				particle->getVelocity().x,
+				particle->getVelocity().y,
+				particle->getVelocity().z * -1
+			));
 
-				particle1[i]->setPos(glm::vec3(
-					particle1[i]->getPos().x,
-					particle1[i]->getPos().y,
-					-cubeSize + 1
-				));
-			}
-			//z +
-			if (particle1[i]->getPos().z >= cubeSize)
-			{
-				particle1[i]->setVel(glm::vec3(
-					particle1[i]->getVelocity().x,
-					particle1[i]->getVelocity().y,
-					particle1[i]->getVelocity().z * -1
-				));
+			particle->setPos(glm::vec3(
+				particle->getPos().x,
+				particle->getPos().y,
+				-cubeSize + 1
+			));
+		}
+		//z +
+		if (particle->getPos().z >= cubeSize)
+		{
+			particle->setVel(glm::vec3(
+				particle->getVelocity().x,
+				particle->getVelocity().y,
+				particle->getVelocity().z * -1
+			));
 
-				particle1[i]->setPos(glm::vec3(
-					particle1[i]->getPos().x,
-					particle1[i]->getPos().y,
-					cubeSize - 5
-				));
-			}
+			particle->setPos(glm::vec3(
+				particle->getPos().x,
+				particle->getPos().y,
+				cubeSize - 5
+			));
 		}
 	}
 }
@@ -1016,7 +967,7 @@ void Life3D_Engine::DrawScene()
 	this->particleShader.setVec3("dirLightColor", glm::vec3(this->dirLightColor.x, this->dirLightColor.y, this->dirLightColor.z));
 	this->particleShader.setVec3("dirLightDir", -this->dirLightPos);
 	this->particleShader.setVec3("lightColor", glm::vec3(BLACK));
-	this->particleShader.setVec3("lightPos", this->dirLightPos);
+	this->particleShader.setVec3("lightPos", glm::vec3(0.0f, 0.0f,0.0f));
 	this->particleShader.setVec3("viewPos", camera.Position);
 
 	this->particleShader.setInt("shininess", 512);
@@ -1107,7 +1058,7 @@ void Life3D_Engine::DrawSettings()
 		//Settings
 		ImGui::Text("Settings");
 		ImGui::SetNextItemWidth((float)this->WINDOW_WIDTH / 5);
-		ImGui::SliderFloat("Timefactor", &this->timeFactor, 0.0f, 1.0f);
+		ImGui::SliderFloat("Timefactor", &this->timeFactor, 0.0f, 2.0f);
 		ImGui::SetNextItemWidth((float)this->WINDOW_WIDTH / 5);
 		ImGui::SliderFloat("Distance", &this->distanceMax, 0.0f, 700.0f);
 		ImGui::SetNextItemWidth((float)this->WINDOW_WIDTH / 5);

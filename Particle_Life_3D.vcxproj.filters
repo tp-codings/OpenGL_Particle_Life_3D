@@ -74,9 +74,6 @@
     <ClCompile Include="src\glad.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="src\Life_3D.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
     <ClCompile Include="src\Life3D_Engine.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>

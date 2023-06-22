@@ -154,7 +154,6 @@ private:
 	void initVertices();
 	void initBuffer();
 	void initShader();
-	void initTextures();
 	void initFont();
 	void initVariables();
 
@@ -176,10 +175,9 @@ private:
 
 	//Helper------------------------------------------------------------------------------
 
-	unsigned int loadTexture(char const* path);
 	std::vector<Life3D_Particles*> create(int number, glm::vec3 color);
 	int random(int range, int start);
-	float force(float x, float a);
+	float force(float d, float a);
 	void randomPosition();
 	void randomAttraction();
 
@@ -189,6 +187,7 @@ private:
 	void updateDeltaTime();
 	void updateCamera();
 	void updateInteraction(std::vector<Life3D_Particles*> particle1, std::vector<Life3D_Particles*>particle2, float attraction);
+	void updateBorders(Life3D_Particles* particle);
 
 	//Rendering------------------------------------------------------------------------------
 

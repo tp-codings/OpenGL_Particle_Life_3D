@@ -39,7 +39,6 @@
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\Life3D_Engine.cpp" />
     <ClCompile Include="src\Life3D_Particles.cpp" />
-    <ClCompile Include="src\Life_3D.cpp" />
     <ClCompile Include="src\stb_handler.cpp" />
   </ItemGroup>
   <ItemGroup>
