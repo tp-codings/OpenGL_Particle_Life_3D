@@ -562,8 +562,7 @@ void Life3D_Engine::processInput(GLFWwindow* window, Shader reflectionShader)
 		this->postProcessingChoice = 4;
 	}
 
-	//Kamerabewegung
-	this->updateCamera();
+
 }
 
 //Callbacks------------------------------------------------------------------------------
@@ -696,6 +695,8 @@ void Life3D_Engine::update()
 {
 	this->updateDeltaTime();
 	this->input();
+	//Kamerabewegung
+	this->updateCamera();
 
 	if (this->start)
 	{
